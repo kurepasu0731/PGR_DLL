@@ -17,6 +17,6 @@ extern "C" {
    DLLExport void* getPGR(int device);
    DLLExport void initPGR(void* camera, int device);
    DLLExport void releasePGR(void* camera, int device);
-   DLLExport void getPGRTexture(void* camera, unsigned char* data, bool isRecord, bool isShowWin);
+   DLLExport void getPGRTexture(void* camera, int device, unsigned char* data, bool isRecord, bool isShowWin);
    DLLExport void showPixelData(unsigned char* data);
 }
