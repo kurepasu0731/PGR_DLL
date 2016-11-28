@@ -24,7 +24,8 @@ DLLExport void initPGR(void* pgr, int device)
 		auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
 
 		//ƒ‚ƒmƒNƒ1ch‚ÅŽæ‚Á‚Ä‚­‚é
-		pgrOpenCV->init(FlyCapture2::PIXEL_FORMAT_RGB8, FlyCapture2::NEAREST_NEIGHBOR); //->ƒ‚ƒmƒNƒ‚¾‚Æ‹““®‚ªˆÀ’è‚µ‚È‚¢‚©‚ç¡‚Ì‚Æ‚±‚ë‚Í3ch‚Å
+		//pgrOpenCV->init(FlyCapture2::PIXEL_FORMAT_RGB8, FlyCapture2::NEAREST_NEIGHBOR); //->ƒ‚ƒmƒNƒ‚¾‚Æ‹““®‚ªˆÀ’è‚µ‚È‚¢‚©‚ç¡‚Ì‚Æ‚±‚ë‚Í3ch‚Å
+		pgrOpenCV->init(FlyCapture2::PIXEL_FORMAT_RGB8, FlyCapture2::HQ_LINEAR); //->ƒ‚ƒmƒNƒ‚¾‚Æ‹““®‚ªˆÀ’è‚µ‚È‚¢‚©‚ç¡‚Ì‚Æ‚±‚ë‚Í3ch‚Å
 		pgrOpenCV->start();
 
 		//˜^‰æ—p
