@@ -8,12 +8,17 @@ TPGROpenCV::TPGROpenCV(int _useCameraIndex)
 	cv::namedWindow(windowNameCamera.c_str(), cv::WINDOW_NORMAL);
 
 	useCamIndex = _useCameraIndex;
+
+	critical_section = boost::shared_ptr<criticalSection> (new criticalSection);
+	imgsrc = boost::shared_ptr<imgSrc>(new imgSrc);
+	imgsrc->image = cv::Mat::zeros(CAMERA_HEIGHT, CAMERA_WIDTH, CV_8UC3);
+
 }
 
 // Destructor
 TPGROpenCV::~TPGROpenCV()
 {
-
+	thread.join();
 }
 
 // initialize PGR
@@ -142,6 +147,8 @@ int TPGROpenCV::PixelFormatInOpenCV()
 
 int TPGROpenCV::start()
 {
+
+
 	fc2Error = fc2Cam.StartCapture();
 	if (fc2Error != FlyCapture2::PGRERROR_OK) {
 		PrintError(fc2Error);
@@ -158,6 +165,12 @@ int TPGROpenCV::start()
 		else {
 			fc2Mat.create(wk.GetRows(), wk.GetCols(), PixelFormatInOpenCV());
 		}
+		quit = false;
+		running = true;
+
+		//スレッド生成
+		thread = boost::thread( &TPGROpenCV::threadFunction, this);
+
 		return 0;
 	}
 	return -1;
@@ -190,6 +203,11 @@ int TPGROpenCV::queryFrame()
 
 int TPGROpenCV::stop()
 {
+	boost::unique_lock<boost::mutex> lock(mutex);
+	quit = true;
+	running = false;
+	lock.unlock();
+
 	fc2Error = fc2Cam.StopCapture();
 	if (fc2Error != FlyCapture2::PGRERROR_OK) {
 		PrintError(fc2Error);
@@ -202,7 +220,9 @@ int TPGROpenCV::stop()
 
 int TPGROpenCV::release()
 {
+	boost::unique_lock<boost::mutex> lock(mutex);
 	fc2Mat.release();
+	lock.unlock();
 
 	fc2Error = fc2Cam.Disconnect();
 	if (fc2Error != FlyCapture2::PGRERROR_OK) {
@@ -298,12 +318,6 @@ float TPGROpenCV::getGain()
 	fc2Prop.absControl = true;
 	return fc2Prop.absValue;
 }
-float TPGROpenCV::getFramerate()
-{
-	fc2Prop.type = FlyCapture2::FRAME_RATE;
-	fc2Prop.absControl = true;
-	return fc2Prop.absValue;
-}
 void TPGROpenCV::getWhiteBalance(int &r, int &b)
 {
 	fc2Cam.GetProperty(&fc2Prop);
@@ -314,6 +328,12 @@ void TPGROpenCV::getWhiteBalance(int &r, int &b)
 	fc2Prop.valueA = r;
 	fc2Prop.valueB = b;
 	fc2Cam.SetProperty(&fc2Prop);
+}
+float TPGROpenCV::getFramerate()
+{
+	fc2Prop.type = FlyCapture2::FRAME_RATE;
+	fc2Prop.absControl = true;
+	return fc2Prop.absValue;
 }
 void TPGROpenCV::setGamma(float gamma)
 {
@@ -371,4 +391,39 @@ void TPGROpenCV::CameraCapture(cv::Mat &image)
 	// rgbImageをMat型に変換
 	image = cv::Mat(cvtImage.GetRows(), cvtImage.GetCols(), CV_8U);
 	memcpy(image.data, cvtImage.GetData(), cvtImage.GetDataSize());
+}
+
+void TPGROpenCV::threadFunction()
+{
+	while(!quit)
+	{
+		boost::shared_ptr<imgSrc> imgsrc = boost::shared_ptr<imgSrc>(new imgSrc);
+		boost::unique_lock<boost::mutex> lock(mutex);
+		queryFrame();
+
+		//cv::Mat gray;
+		//cv::cvtColor(fc2Mat, gray, CV_RGB2GRAY);
+		//cv::Mat resized;
+		//cv::resize(gray, resized, cv::Size(), RESIZESCALE, RESIZESCALE);
+
+		////適応的閾値処理
+		//cv::adaptiveThreshold(resized, resized, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 7, A_THRESH_VAL);
+		////膨張処理
+		//cv::dilate(resized, resized, cv::Mat());
+
+		//cv::Mat ptsImg = cv::Mat::zeros( CAMERA_HEIGHT, CAMERA_WIDTH, CV_8UC1); //原寸大表示用
+		//cv::resize(resized, ptsImg, cv::Size(), 1/RESIZESCALE, 1/RESIZESCALE);
+
+		lock.unlock();
+
+		imgsrc->image = fc2Mat;
+		critical_section->setImageSource(imgsrc);
+	}
+}
+
+//スレッドから取ってくる
+cv::Mat TPGROpenCV::getVideo()
+{
+	critical_section->getImageSource(imgsrc);
+	return imgsrc->image;
 }

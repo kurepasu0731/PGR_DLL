@@ -4,13 +4,18 @@
 
 #define PGR_PARAMETER_FILE "./parameter.ini"
 
+#define RESIZESCALE 0.5
+#define A_THRESH_VAL -5
+
 #pragma once
 
 #include <FlyCapture2.h>
 #include <opencv2\opencv.hpp>
+#include <boost/thread/thread.hpp>
 #include <cstdio>
 #include <iostream>
 #include "Timer.h"
+#include "criticalSection.h"
 
 class TPGROpenCV
 {
@@ -36,13 +41,14 @@ private:
 	unsigned int				Wb_Red;
 	unsigned int				Wb_Blue;
 	cv::Mat						fc2Mat;
+	boost::shared_ptr<imgSrc> imgsrc;
 
 	float						delay;
 	
 	void loadParameters();
 
 public:
-	TPGROpenCV(int _useCameraIndex = 0);
+	TPGROpenCV(int _useCameraIndex);
 	~TPGROpenCV();
 	int init( FlyCapture2::PixelFormat _format = FlyCapture2::PIXEL_FORMAT_BGR, int ColorProcessingAlgorithm = FlyCapture2::ColorProcessingAlgorithm::HQ_LINEAR);
 	void PrintBuildInfo();
@@ -69,14 +75,29 @@ public:
 	// パラメータを取得するメソッド
 	float getShutterSpeed();
 	float getGain();
-	float getFramerate();
 	void getWhiteBalance(int &r, int &b);
+	float getFramerate();
 	void showCapImg(cv::Mat cap = cv::Mat());	//撮影画像を表示
 	void CameraCapture(cv::Mat &image);			// 撮影画像をMatで取得
 
-	cv::Mat getVideo(){ return fc2Mat; };
+	//cv::Mat getVideo(){ return fc2Mat; };
+	cv::Mat getVideo();
 
 	Timer tm;
+
+protected:
+	boost::thread thread;
+	mutable boost::mutex mutex;
+
+	//スレッド処理
+	void threadFunction();
+
+	bool quit;
+	bool running;
+
+	//! スレッド間の共有クラス
+	boost::shared_ptr<criticalSection> critical_section;
+
 };
 
 #endif

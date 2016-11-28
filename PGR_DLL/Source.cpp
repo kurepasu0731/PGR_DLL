@@ -67,7 +67,7 @@ DLLExport void getPGRTexture(void* pgr, int device, unsigned char* data, bool is
 
 			// ƒJƒƒ‰‰æ‚ÌŽæ“¾
 			cv::Mat img;
-			pgrOpenCV->queryFrame();
+			//pgrOpenCV->queryFrame();
 			img = pgrOpenCV->getVideo();
 
 			if(!img.empty())
