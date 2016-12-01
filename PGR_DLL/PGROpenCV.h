@@ -4,9 +4,6 @@
 
 #define PGR_PARAMETER_FILE "./parameter.ini"
 
-#define RESIZESCALE 0.5
-#define A_THRESH_VAL -5
-
 #pragma once
 
 #include <FlyCapture2.h>
@@ -47,6 +44,20 @@ private:
 	
 	void loadParameters();
 
+	//**ドット検出関連**//
+	float RESIZESCALE;
+	double A_THRESH_VAL;
+	int DOT_THRESH_VAL_MIN;  // ドットノイズ弾き
+	int DOT_THRESH_VAL_MAX; // エッジノイズ弾き
+
+	std::vector<cv::Point> dots;
+	std::vector<int> data;
+
+	void calCoG_dot_v0(cv::Mat &src, cv::Point& sum, int& cnt, cv::Point& min, cv::Point& max, cv::Point p);
+
+	bool getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, int dots_thresh_min, int dots_thresh_max, float resizeScale, cv::Mat &drawimage);
+
+
 public:
 	TPGROpenCV(int _useCameraIndex);
 	~TPGROpenCV();
@@ -82,6 +93,12 @@ public:
 
 	//cv::Mat getVideo(){ return fc2Mat; };
 	cv::Mat getVideo();
+
+	//**ドット検出関連**//
+	void setDotsParameters(double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale);
+	int getDotsCount();
+	void getDotsData(std::vector<int> &data);
+	//void getDotsData(int *data);
 
 	Timer tm;
 

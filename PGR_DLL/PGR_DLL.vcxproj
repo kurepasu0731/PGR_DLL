@@ -159,6 +159,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="criticalSection.h" />
     <ClInclude Include="DebugLogWrapper.h" />
     <ClInclude Include="PGROpenCV.h" />
     <ClInclude Include="Source.h" />

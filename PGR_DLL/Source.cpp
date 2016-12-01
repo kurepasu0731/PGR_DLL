@@ -137,3 +137,30 @@ DLLExport void showPixelData(unsigned char* data)
 	cv::imshow("PGR", pgr_img);
 
 }
+
+
+//**ドット検出関連**//
+DLLExport void setDotsParameters(void* pgr, double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale)
+{
+auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
+
+pgrOpenCV->setDotsParameters(AthreshVal, DotThreshValMin, DotThreshValMax, resizeScale);
+
+}
+
+DLLExport int getDotsCount(void* pgr)
+{
+	auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
+	return pgrOpenCV->getDotsCount();
+}
+
+DLLExport void getDotsData(void* pgr, int *data)
+{
+	auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
+	std::vector<int> datavec;
+	pgrOpenCV->getDotsData(datavec); //dataのサイズはdotsCount*2
+	//data = &datavec[0];
+	memcpy(data, &datavec[0], datavec.size()*sizeof(int));
+}
+
+
