@@ -445,7 +445,7 @@ void TPGROpenCV::threadFunction()
 
 		critical_section->setImageSource(imgsrc);
 
-		cv::imshow("dots detect", drawimage);
+		//cv::imshow("dots detect", drawimage);
 	}
 }
 
@@ -459,6 +459,21 @@ cv::Mat TPGROpenCV::getVideo()
 //**ドット検出関連**//
 bool TPGROpenCV::getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, int dots_thresh_min, int dots_thresh_max, float resizeScale, cv::Mat &drawimage)
 {
+
+	//マスクをかける
+	for(int y = 0; y < src.rows; y++)
+	{
+		for(int x = 0; x < src.cols; x++)
+		{
+			if(mask.data[(y * mask.cols + x) * 3 + 0] == 0 && mask.data[(y * mask.cols + x) * 3 + 1] == 0 && mask.data[(y * mask.cols + x) * 3 + 2] == 0)
+			{
+					src.data[(y * src.cols + x) * 3 + 0] = 0; 
+					src.data[(y * src.cols + x) * 3 + 1] = 0; 
+					src.data[(y * src.cols + x) * 3 + 2] = 0; 
+			}
+		}
+	}
+
 	dots.clear();
 	cv::Mat gray;
 	cv::cvtColor(src, gray, CV_RGB2GRAY);
@@ -479,7 +494,9 @@ bool TPGROpenCV::getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, i
 	int cnt;
 	for (int i = 0; i < ptsImg.rows; i++) {
 		for (int j = 0; j < ptsImg.cols; j++) {
-			if (ptsImg.at<uchar>(i, j)) {
+			if (ptsImg.at<uchar>(i, j))
+				//mask.at<uchar>(i, j) != 0 && mask.at<uchar>(i, j) != 0 && mask.at<uchar>(i, j) != 0)
+			{
 				sum = cv::Point(0, 0); cnt = 0; min = cv::Point(j, i); max = cv::Point(j, i);
 				calCoG_dot_v0(ptsImg, sum, cnt, min, max, cv::Point(j, i));
 				if (cnt>dots_thresh_min && max.x - min.x < dots_thresh_max && max.y - min.y < dots_thresh_max) {
@@ -507,7 +524,8 @@ bool TPGROpenCV::getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, i
 
 void TPGROpenCV::calCoG_dot_v0(cv::Mat &src, cv::Point& sum, int& cnt, cv::Point& min, cv::Point& max, cv::Point p)
 {
-	if (src.at<uchar>(p)) {
+	if (src.at<uchar>(p))// && mask.at<uchar>(p) != 0 && mask.at<uchar>(p) != 0 && mask.at<uchar>(p) != 0)
+	{
 		sum += p; cnt++;
 		src.at<uchar>(p) = 0;
 		if (p.x<min.x) min.x = p.x;

@@ -58,6 +58,7 @@ private:
 	bool getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, int dots_thresh_min, int dots_thresh_max, float resizeScale, cv::Mat &drawimage);
 
 
+
 public:
 	TPGROpenCV(int _useCameraIndex);
 	~TPGROpenCV();
@@ -99,6 +100,8 @@ public:
 	int getDotsCount();
 	void getDotsData(std::vector<int> &data);
 	//void getDotsData(int *data);
+
+	cv::Mat mask; //投影対象領域（マスク用）
 
 	Timer tm;
 

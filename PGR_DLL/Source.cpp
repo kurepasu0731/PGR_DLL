@@ -163,4 +163,28 @@ DLLExport void getDotsData(void* pgr, int *data)
 	memcpy(data, &datavec[0], datavec.size()*sizeof(int));
 }
 
+//マスク生成
+DLLExport void createCameraMask_pgr(void* pgr, unsigned char* cam_data)
+{
+	auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
+
+	//カメラ画像をMatに復元
+	cv::Mat cam_img(PGRHEIGHT, PGRWIDTH, CV_8UC4, cam_data);
+	//プロジェクタ画像はUnity側で生成されたので、反転とかする
+	//BGR <-- ARGB 変換
+	cv::Mat bgr_img, flip_cam_img;
+	std::vector<cv::Mat> bgra;
+	cv::split(cam_img, bgra);
+	std::swap(bgra[0], bgra[3]);
+	std::swap(bgra[1], bgra[2]);
+	cv::cvtColor(cam_img, bgr_img, CV_BGRA2BGR);
+	//x軸反転
+	cv::flip(bgr_img, flip_cam_img, 0);
+
+	pgrOpenCV->mask = flip_cam_img.clone();
+
+	cv::imshow("mask", pgrOpenCV->mask);
+
+}
+
 

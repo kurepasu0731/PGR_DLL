@@ -23,4 +23,6 @@ extern "C" {
    DLLExport void setDotsParameters(void* camera, double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale);
    DLLExport int getDotsCount(void* camera);
    DLLExport void getDotsData(void* camera, int *data);
+   //É}ÉXÉNê∂ê¨
+	DLLExport void createCameraMask_pgr(void* camera, unsigned char* cam_data);
 }
