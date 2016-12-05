@@ -490,19 +490,28 @@ bool TPGROpenCV::getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, i
 	cv::Mat ptsImgColor; 
 	cv::cvtColor(ptsImg, ptsImgColor, CV_GRAY2BGR);
 
+	//HSV画像作成
+	cv::Mat srchsv;
+	cv::cvtColor(src, srchsv, CV_RGB2HSV);
+
 	cv::Point sum, min, max, p;
 	int cnt;
 	for (int i = 0; i < ptsImg.rows; i++) {
 		for (int j = 0; j < ptsImg.cols; j++) {
-			if (ptsImg.at<uchar>(i, j))
-				//mask.at<uchar>(i, j) != 0 && mask.at<uchar>(i, j) != 0 && mask.at<uchar>(i, j) != 0)
-			{
+			if (ptsImg.at<uchar>(i, j)) {
 				sum = cv::Point(0, 0); cnt = 0; min = cv::Point(j, i); max = cv::Point(j, i);
 				calCoG_dot_v0(ptsImg, sum, cnt, min, max, cv::Point(j, i));
 				if (cnt>dots_thresh_min && max.x - min.x < dots_thresh_max && max.y - min.y < dots_thresh_max) {
-					dots.push_back(cv::Point(sum.x / cnt, sum.y / cnt));
-					//dots.push_back(cv::Point((int)((float)(sum.x / cnt) / resizeScale + 0.5), (int)((float)(sum.y / cnt) / resizeScale + 0.5)));
 
+					//検出した点が壁の汚れである可能性があるので、色で識別する
+					int x = sum.x / cnt;
+					int y = sum.y / cnt;
+					int index = srchsv.step * y + (x * 3);
+					if(srchsv.data[index + 2] >= 150)
+					{
+						dots.push_back(cv::Point(x, y));
+						//dots.push_back(cv::Point((int)((float)(sum.x / cnt) / resizeScale + 0.5), (int)((float)(sum.y / cnt) / resizeScale + 0.5)));
+					}
 				}
 			}
 		}

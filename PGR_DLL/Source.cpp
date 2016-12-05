@@ -181,7 +181,18 @@ DLLExport void createCameraMask_pgr(void* pgr, unsigned char* cam_data)
 	//x²”½“]
 	cv::flip(bgr_img, flip_cam_img, 0);
 
-	pgrOpenCV->mask = flip_cam_img.clone();
+	//–c’£ˆ—‚©‚¯‚Æ‚­
+	cv::Mat resizeimg, dilatedimg, resultimg;
+	cv::Mat element(9,9,CV_8U, cv::Scalar(1));
+	cv::bitwise_not(flip_cam_img, flip_cam_img);
+	cv::resize(flip_cam_img, resizeimg, cv::Size(), 0.5, 0.5);
+	cv::dilate(resizeimg, dilatedimg, element, cv::Point(-1,-1), 1);
+	cv::resize(dilatedimg, resultimg, cv::Size(), 2.0, 2.0);
+	cv::bitwise_not(resultimg, resultimg);
+	pgrOpenCV->mask = resultimg.clone();
+
+
+	//pgrOpenCV->mask = flip_cam_img.clone();
 
 	cv::imshow("mask", pgrOpenCV->mask);
 
