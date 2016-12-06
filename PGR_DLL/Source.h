@@ -20,7 +20,7 @@ extern "C" {
    DLLExport void getPGRTexture(void* camera, int device, unsigned char* data, bool isRecord, bool isShowWin);
    DLLExport void showPixelData(unsigned char* data);
 	//**ドット検出関連**//
-   DLLExport void setDotsParameters(void* camera, double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale);
+   DLLExport void setDotsParameters(void* camera, double AthreshVal, int DotThreshValMin, int DotThreshValMax, int DotThreshValBright, float resizeScale);
    DLLExport int getDotsCount(void* camera);
    DLLExport void getDotsData(void* camera, int *data);
    //マスク生成

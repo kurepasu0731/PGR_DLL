@@ -507,7 +507,7 @@ bool TPGROpenCV::getDots(cv::Mat &src, std::vector<cv::Point> &dots, double C, i
 					int x = sum.x / cnt;
 					int y = sum.y / cnt;
 					int index = srchsv.step * y + (x * 3);
-					if(srchsv.data[index + 2] >= 150)
+					if(srchsv.data[index + 2] >= DOT_THRESH_VAL_BRIGHT)
 					{
 						dots.push_back(cv::Point(x, y));
 						//dots.push_back(cv::Point((int)((float)(sum.x / cnt) / resizeScale + 0.5), (int)((float)(sum.y / cnt) / resizeScale + 0.5)));
@@ -549,11 +549,12 @@ void TPGROpenCV::calCoG_dot_v0(cv::Mat &src, cv::Point& sum, int& cnt, cv::Point
 	}
 }
 
-void TPGROpenCV::setDotsParameters( double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale)
+void TPGROpenCV::setDotsParameters( double AthreshVal, int DotThreshValMin, int DotThreshValMax, int DotThreshValBright, float resizeScale)
 {
 	A_THRESH_VAL = AthreshVal;
 	DOT_THRESH_VAL_MIN = DotThreshValMin;
 	DOT_THRESH_VAL_MAX = DotThreshValMax;
+	DOT_THRESH_VAL_BRIGHT = DotThreshValBright;
 	RESIZESCALE = resizeScale;
 }
 

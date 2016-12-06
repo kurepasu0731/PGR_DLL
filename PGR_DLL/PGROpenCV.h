@@ -49,6 +49,7 @@ private:
 	double A_THRESH_VAL;
 	int DOT_THRESH_VAL_MIN;  // ドットノイズ弾き
 	int DOT_THRESH_VAL_MAX; // エッジノイズ弾き
+	int DOT_THRESH_VAL_BRIGHT; //ドット色閾値
 
 	std::vector<cv::Point> dots;
 	std::vector<int> data;
@@ -96,7 +97,7 @@ public:
 	cv::Mat getVideo();
 
 	//**ドット検出関連**//
-	void setDotsParameters(double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale);
+	void setDotsParameters(double AthreshVal, int DotThreshValMin, int DotThreshValMax, int DotThreshValBright, float resizeScale);
 	int getDotsCount();
 	void getDotsData(std::vector<int> &data);
 	//void getDotsData(int *data);

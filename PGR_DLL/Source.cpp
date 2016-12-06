@@ -140,11 +140,11 @@ DLLExport void showPixelData(unsigned char* data)
 
 
 //**ドット検出関連**//
-DLLExport void setDotsParameters(void* pgr, double AthreshVal, int DotThreshValMin, int DotThreshValMax, float resizeScale)
+DLLExport void setDotsParameters(void* pgr, double AthreshVal, int DotThreshValMin, int DotThreshValMax, int DotThreshValBright, float resizeScale)
 {
 auto pgrOpenCV = static_cast<TPGROpenCV*>(pgr);
 
-pgrOpenCV->setDotsParameters(AthreshVal, DotThreshValMin, DotThreshValMax, resizeScale);
+pgrOpenCV->setDotsParameters(AthreshVal, DotThreshValMin, DotThreshValMax, DotThreshValBright, resizeScale);
 
 }
 
